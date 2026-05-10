@@ -1,7 +1,9 @@
-Setup/Config Flow Chart
+# Setup/Config Flow Chart
+
+```mermaid
+flowchart TD
 
 subgraph Azure
-    direction TD
     A1[Register app in Azure]
     A2[Create client secret]
     A3[Add Dynamics CRM permissions and grant access steps]
@@ -11,7 +13,6 @@ subgraph Azure
 end
 
 subgraph PowerPlatform
-    direction TD
     P1[Open Power Platform Admin Center and select environment]
     P2[Go to Application Users]
     P3[Add application user and assign Service Reader role]
@@ -19,7 +20,6 @@ subgraph PowerPlatform
 end
 
 subgraph DataverseAPI
-    direction TD
     D1[Copy Dataverse environment base URL]
     D2[Build Web API endpoint]
     D3[Test authentication and API access]
@@ -34,3 +34,4 @@ end
 
 A5 --> P1
 P3 --> D1
+```
