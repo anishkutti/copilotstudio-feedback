@@ -13,6 +13,7 @@ import {
   saveConfig,
 } from "./authConfig";
 import { fetchAllFeedback, fetchEnvironmentName } from "./services/dataverse";
+import { exportFeedbackToExcel } from "./services/excelExport";
 import { AppConfig, FeedbackItem } from "./types";
 import ConfigPage from "./components/ConfigPage";
 import FeedbackTable from "./components/FeedbackTable";
@@ -169,6 +170,15 @@ function Dashboard({
             disabled={loading}
           >
             {loading ? "Loading…" : "↻ Refresh"}
+          </button>
+
+          <button
+            className="btn-secondary btn-sm"
+            onClick={() => exportFeedbackToExcel(filtered, `feedback-${new Date().toISOString().split("T")[0]}.xlsx`)}
+            disabled={filtered.length === 0}
+            title="Export filtered feedback to Excel"
+          >
+            📥 Export to Excel
           </button>
         </div>
 
