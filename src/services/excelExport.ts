@@ -13,9 +13,11 @@ export function exportFeedbackToExcel(
   // Transform feedback items to a format suitable for Excel
   const data = items.map((item) => ({
     "Agent Name": item.agentName,
+    "Requested Prompt": item.requestedPrompt,
     "Feedback Text": item.feedbackText,
     "Reaction": item.reaction,
     "Agent Message": item.agentMessage,
+    "Start Time": item.startTime,
     "Timestamp": item.timestamp,
     "Transcript ID": item.transcriptId,
   }));
@@ -28,9 +30,11 @@ export function exportFeedbackToExcel(
   // Auto-fit column widths
   const colWidths = [
     { wch: 20 }, // Agent Name
+    { wch: 40 }, // Requested Prompt
     { wch: 40 }, // Feedback Text
     { wch: 12 }, // Reaction
     { wch: 40 }, // Agent Message
+    { wch: 20 }, // Start Time
     { wch: 20 }, // Timestamp
     { wch: 25 }, // Transcript ID
   ];

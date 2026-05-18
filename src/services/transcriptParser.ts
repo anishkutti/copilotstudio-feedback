@@ -45,12 +45,43 @@ export function extractFeedback(
       const reaction = activity.value.actionValue?.reaction ?? "";
 
       // Resolve the agent message this feedback is attached to via replyToId
+      // Then walk one more level up to the original user message.
       let agentMessage = "";
+      let requestedPrompt = "";
+      let startTime = "";
       if (activity.replyToId) {
         const referenced = activityMap.get(activity.replyToId);
         if (referenced) {
           // Prefer the full spoken text; fall back to the display text
           agentMessage = referenced.speak ?? referenced.text ?? "";
+
+          // If the referenced bot message refers to an earlier user message,
+          // use that deeper message text as the requested prompt.
+          if (referenced.type === "message" && referenced.replyToId) {
+            const originalRequest = activityMap.get(referenced.replyToId);
+            if (originalRequest?.type === "message") {
+              requestedPrompt = originalRequest.text ?? "";
+              const originalTimestampMs =
+                originalRequest.timestampMs ??
+                (originalRequest.timestamp != null ? originalRequest.timestamp * 1000 : null);
+              startTime =
+                originalTimestampMs != null
+                  ? new Date(originalTimestampMs).toISOString()
+                  : "";
+            }
+          }
+
+          // Fall back to the referenced activity if there is no deeper user message.
+          if (!requestedPrompt) {
+            requestedPrompt = referenced.text ?? "";
+            const referencedTimestampMs =
+              referenced.timestampMs ??
+              (referenced.timestamp != null ? referenced.timestamp * 1000 : null);
+            startTime =
+              referencedTimestampMs != null
+                ? new Date(referencedTimestampMs).toISOString()
+                : "";
+          }
         }
       }
 
@@ -65,6 +96,8 @@ export function extractFeedback(
         feedbackText,
         reaction,
         agentMessage,
+        requestedPrompt,
+        startTime,
         timestamp: timestampMs != null ? new Date(timestampMs).toISOString() : "",
         transcriptId,
       });

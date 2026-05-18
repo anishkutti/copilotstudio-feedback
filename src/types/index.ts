@@ -14,6 +14,8 @@ export interface FeedbackItem {
   feedbackText: string;
   reaction: string;
   agentMessage: string;
+  requestedPrompt: string;
+  startTime: string;
   timestamp: string;
   transcriptId: string;
 }

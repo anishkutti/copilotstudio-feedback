@@ -51,8 +51,10 @@ export default function FeedbackTable({ items }: Props) {
           <tr>
             <th style={{ width: 110 }}>Reaction</th>
             <th style={{ width: 160 }}>Agent</th>
+            <th>Requested Prompt</th>
             <th>Feedback</th>
             <th>Agent Message</th>
+            <th style={{ width: 130 }}>Start Time</th>
             <th style={{ width: 130 }}>Timestamp</th>
           </tr>
         </thead>
@@ -72,6 +74,11 @@ export default function FeedbackTable({ items }: Props) {
                   </td>
                   <td className="cell-agent">{item.agentName}</td>
                   <td className="cell-text">
+                    {truncate(item.requestedPrompt, 140) || (
+                      <em className="muted">Not available</em>
+                    )}
+                  </td>
+                  <td className="cell-text">
                     {truncate(item.feedbackText, 140) || (
                       <em className="muted">No text provided</em>
                     )}
@@ -81,16 +88,21 @@ export default function FeedbackTable({ items }: Props) {
                       <em className="muted">Not available</em>
                     )}
                   </td>
+                  <td className="cell-timestamp">{formatDate(item.startTime)}</td>
                   <td className="cell-timestamp">{formatDate(item.timestamp)}</td>
                 </tr>
 
                 {isExpanded && (
                   <tr className="detail-row">
-                    <td colSpan={5}>
+                    <td colSpan={7}>
                       <div className="detail-content">
                         <div className="detail-section">
                           <h4>Feedback</h4>
                           <p>{item.feedbackText || "No text provided."}</p>
+                        </div>
+                        <div className="detail-section">
+                          <h4>Requested Prompt</h4>
+                          <p>{item.requestedPrompt || "Not available."}</p>
                         </div>
                         <div className="detail-section">
                           <h4>Agent Message</h4>
@@ -103,6 +115,9 @@ export default function FeedbackTable({ items }: Props) {
                           <span>
                             <strong>Reaction:</strong>{" "}
                             <ReactionBadge reaction={item.reaction} />
+                          </span>
+                          <span>
+                            <strong>Start:</strong> {formatDate(item.startTime)}
                           </span>
                           <span>
                             <strong>Time:</strong> {formatDate(item.timestamp)}
