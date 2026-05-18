@@ -54,8 +54,9 @@ export default function FeedbackTable({ items }: Props) {
             <th>Requested Prompt</th>
             <th>Feedback</th>
             <th>Agent Message</th>
-            <th style={{ width: 130 }}>Start Time</th>
-            <th style={{ width: 130 }}>Timestamp</th>
+            <th style={{ width: 130 }}>Prompt Time</th>
+            <th style={{ width: 130 }}>Response Time</th>
+            <th style={{ width: 130 }}>Feedback Time</th>
           </tr>
         </thead>
         <tbody>
@@ -89,12 +90,13 @@ export default function FeedbackTable({ items }: Props) {
                     )}
                   </td>
                   <td className="cell-timestamp">{formatDate(item.startTime)}</td>
+                  <td className="cell-timestamp">{formatDate(item.replyTime)}</td>
                   <td className="cell-timestamp">{formatDate(item.timestamp)}</td>
                 </tr>
 
                 {isExpanded && (
                   <tr className="detail-row">
-                    <td colSpan={7}>
+                    <td colSpan={8}>
                       <div className="detail-content">
                         <div className="detail-section">
                           <h4>Feedback</h4>
@@ -115,6 +117,9 @@ export default function FeedbackTable({ items }: Props) {
                           <span>
                             <strong>Reaction:</strong>{" "}
                             <ReactionBadge reaction={item.reaction} />
+                          </span>
+                          <span>
+                            <strong>Reply:</strong> {formatDate(item.replyTime)}
                           </span>
                           <span>
                             <strong>Start:</strong> {formatDate(item.startTime)}

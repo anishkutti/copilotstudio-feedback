@@ -17,8 +17,9 @@ export function exportFeedbackToExcel(
     "Feedback Text": item.feedbackText,
     "Reaction": item.reaction,
     "Agent Message": item.agentMessage,
-    "Start Time": item.startTime,
-    "Timestamp": item.timestamp,
+    "Prompt Time": item.startTime,
+    "Response Time": item.replyTime,
+    "Feedback Time": item.timestamp,
     "Transcript ID": item.transcriptId,
   }));
 
@@ -34,6 +35,7 @@ export function exportFeedbackToExcel(
     { wch: 40 }, // Feedback Text
     { wch: 12 }, // Reaction
     { wch: 40 }, // Agent Message
+    { wch: 20 }, // Reply Time
     { wch: 20 }, // Start Time
     { wch: 20 }, // Timestamp
     { wch: 25 }, // Transcript ID

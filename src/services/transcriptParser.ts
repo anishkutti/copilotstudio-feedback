@@ -48,12 +48,21 @@ export function extractFeedback(
       // Then walk one more level up to the original user message.
       let agentMessage = "";
       let requestedPrompt = "";
+      let replyTime = "";
       let startTime = "";
       if (activity.replyToId) {
         const referenced = activityMap.get(activity.replyToId);
         if (referenced) {
           // Prefer the full spoken text; fall back to the display text
           agentMessage = referenced.speak ?? referenced.text ?? "";
+
+          const referencedTimestampMs =
+            referenced.timestampMs ??
+            (referenced.timestamp != null ? referenced.timestamp * 1000 : null);
+          replyTime =
+            referencedTimestampMs != null
+              ? new Date(referencedTimestampMs).toISOString()
+              : "";
 
           // If the referenced bot message refers to an earlier user message,
           // use that deeper message text as the requested prompt.
@@ -74,13 +83,9 @@ export function extractFeedback(
           // Fall back to the referenced activity if there is no deeper user message.
           if (!requestedPrompt) {
             requestedPrompt = referenced.text ?? "";
-            const referencedTimestampMs =
-              referenced.timestampMs ??
-              (referenced.timestamp != null ? referenced.timestamp * 1000 : null);
-            startTime =
-              referencedTimestampMs != null
-                ? new Date(referencedTimestampMs).toISOString()
-                : "";
+            if (!startTime) {
+              startTime = replyTime;
+            }
           }
         }
       }
@@ -97,6 +102,7 @@ export function extractFeedback(
         reaction,
         agentMessage,
         requestedPrompt,
+        replyTime,
         startTime,
         timestamp: timestampMs != null ? new Date(timestampMs).toISOString() : "",
         transcriptId,
