@@ -1,6 +1,73 @@
 import { FeedbackItem, TranscriptActivity, TranscriptContent } from "../types";
 
 /**
+ * Normalizes feedback data by replacing escaped unicode sequences (\u0022, etc.)
+ * with their actual character equivalents. This handles cases where feedback JSON
+ * is double-encoded with escaped quotes.
+ */
+function normalizeUnicodeEscapes(value: unknown): unknown {
+  if (typeof value === "string") {
+    // Replace all \uXXXX sequences with their actual characters
+    try {
+      const unescaped = value.replace(/\\u([0-9A-Fa-f]{4})/g, (_match, hex) => {
+        return String.fromCharCode(parseInt(hex, 16));
+      });
+      // Try to parse as JSON if it looks like JSON
+      if (unescaped.startsWith("{") || unescaped.startsWith("[")) {
+        return JSON.parse(unescaped);
+      }
+      return unescaped;
+    } catch {
+      return value;
+    }
+  }
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    const normalized: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      normalized[key] = normalizeUnicodeEscapes(val);
+    }
+    return normalized;
+  }
+  return value;
+}
+
+/**
+ * Safely extracts feedback text from the feedback object, handling cases where
+ * the feedback might be a string with escaped unicode characters.
+ */
+function extractFeedbackText(feedbackValue: unknown): string {
+  if (!feedbackValue) return "";
+
+  // First normalize any unicode escapes
+  const normalized = normalizeUnicodeEscapes(feedbackValue);
+
+  // Try to access feedbackText from the normalized object
+  if (
+    typeof normalized === "object" &&
+    normalized !== null &&
+    "feedbackText" in normalized
+  ) {
+    const text = (normalized as Record<string, unknown>).feedbackText;
+    return typeof text === "string" ? text : "";
+  }
+
+  // If normalized is still a string, try one more parse attempt
+  if (typeof normalized === "string") {
+    try {
+      const parsed = JSON.parse(normalized);
+      if (typeof parsed === "object" && parsed !== null && "feedbackText" in parsed) {
+        return typeof parsed.feedbackText === "string" ? parsed.feedbackText : "";
+      }
+    } catch {
+      // Return the string as-is if it's not valid JSON
+      return normalized;
+    }
+  }
+
+  return "";
+}
+
+/**
  * Parses a conversation transcript JSON string and extracts all feedback items.
  *
  * Feedback is identified by activities with:
@@ -40,8 +107,7 @@ export function extractFeedback(
       activity.name === "message/submitAction" &&
       activity.value?.actionName === "feedback"
     ) {
-      const feedbackText =
-        activity.value.actionValue?.feedback?.feedbackText ?? "";
+      const feedbackText = extractFeedbackText(activity.value.actionValue?.feedback);
       const reaction = activity.value.actionValue?.reaction ?? "";
 
       // Resolve the agent message this feedback is attached to via replyToId
