@@ -96,6 +96,8 @@ The output is written to the `dist/` folder. You can serve it with any static fi
 3. It calls the **Dataverse Web API** to fetch all records from the `ConversationTranscript` table (paginating through `@odata.nextLink` if needed).
 4. Each transcript's JSON `content` field is parsed to find **feedback activities** — activities of type `invoke` with `actionName === "feedback"`.
 5. The feedback text, reaction (like/dislike), and the agent message it refers to (resolved via `replyToId`) are extracted and displayed in the table.
+6. It identifies the linked prompt and results linked to the provided feedback
+7. The export to excel icon exports helps export data for further analysis
 
 ## Tech stack
 
